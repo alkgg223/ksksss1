@@ -14,12 +14,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Unpack source
-        run: unzip -q gunsmod-source.zip -d proj
-      - name: Build
-        run: gradle build --no-daemon
-        working-directory: proj
+      - name: Unpack and build
+        run: |
+          unzip -q gunsmod-source.zip -d proj
+          find proj -maxdepth 3 | head -30
+          D=$(dirname "$(find proj -name build.gradle | head -1)")
+          echo "Building in: $D"
+          cd "$D"
+          gradle build --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: gunsmod-jar
-          path: proj/build/libs/*.jar
+          path: proj/**/build/libs/*.jar
